@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
+import os
+import dj_database_url # <--- ADDING THIS LINE
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,7 +28,15 @@ SECRET_KEY = 'django-insecure-^$pmi()#%+&%!20cgw^m&z&s&wak%5zrzljb5b=8l9#irwx!te
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+
+
 ALLOWED_HOSTS = []
+
+# Get the Render hostname environment variable and add it to allowed hosts
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+# -----------------------------
 
 
 # Application definition
@@ -40,6 +51,8 @@ INSTALLED_APPS = [
 'django.contrib.messages',
 'django.contrib.staticfiles',
 'students', # the name of our application
+# ADDED: Production web server
+ 'gunicorn',
 ]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -75,14 +88,14 @@ WSGI_APPLICATION = 'djangoproject.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-'default': {
-'ENGINE': 'django.db.backends.postgresql',
-'NAME': 'django',
-'USER': 'postgres',
-'PASSWORD': 'postgres',
-'HOST': '127.0.0.1',
-'PORT': '5432',
-}
+# set by Render to connect to the production PostgreSQL instance.
+
+    'default': dj_database_url.config(
+        default='sqlite:///db.sqlite3',  # Fallback to SQLite for local development
+        conn_max_age=600  # Optional: connection pooling
+    )
+
+
 }
 
 
@@ -120,7 +133,17 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
+
+
+
 STATIC_URL = 'static/'
+# --- NEW STATIC FILE CONFIGURATION ---
+# This is where Django will collect static files when deployed
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# ------------------------------------
+
+
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
