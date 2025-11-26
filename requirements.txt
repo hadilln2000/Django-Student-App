@@ -1,19 +1,4 @@
-Core Framework (REQUIRED)
-
-CRITICAL: If you use a different Django version, update 4.2 to your version (e.g., 5.0)
-
 Django==3.12.4
-
-Production Server (REQUIRED by Render for Python apps)
-
 gunicorn
-
-Database Connector (REQUIRED for PostgreSQL)
-
-psycopg2-binary
-
-Database URL Parser (REQUIRED for reading Render's DATABASE_URL env variable)
-
 dj-database-url
-
-Add any other third-party libraries your project uses below this line
+psycopg2-binary
